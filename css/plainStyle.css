@@ -124,7 +124,7 @@ div.header h2.title {
   font-weight:normal;
   font-size:36px;
   margin-top: 10px;
-  margin-bottom: 50px;
+  margin-bottom: 0px;
 }
 
 div.header a {
@@ -150,35 +150,41 @@ div.post a:visited {
 /*home 专用属性部分*/
 div.shortIntro {
 
-  margin-top: 30px;
-  margin-bottom: 70px;
+  margin-top: 10px;
+  margin-bottom: 90px;
+  border-top: 1px dashed #cccccc;
 }
 
 div.shortIntro h2.title {
-
+  font-size: 30px;
   color: #1a1a1a;
   margin-bottom: 10px;
 }
 
-div.shortIntro p.date,p.tag {
+div.shortIntro p {
   margin-top: 0px;
   margin-bottom: 0px;
+}
+
+div.shortIntro p.date,p.tag {
+  font-size: 13px;
   color: #6a6a6a;
 }
 
-div.shortIntro p.excerpt{
-
+div.shortIntro div.excerpt p{
   margin-top: 10px;
-  margin-bottom: 0px;
+  font-size: 15px;
   color: #1a1a1a;
 }
 
 div.shortIntro a {
 
   color: #1a1a1a;
+  border: 0px;
 }
 
 div.shortIntro a:hover {
 
   color: #165fa6;
+  border-bottom: 1px dashed #165fa6;
 }

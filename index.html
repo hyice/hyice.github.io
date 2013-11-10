@@ -14,7 +14,9 @@ title: My Home Page
         {% endfor %}
       </p>
       <p class="date">{{ post.date | date: '%m月%d日，%Y年 '}}</p>
-    	<p class="excerpt">{{ post.excerpt | markdownify }}</p>
+    	<div class="excerpt">
+        {{ post.excerpt | markdownify }}
+      </div>
     </div>
   {% endfor %}
 </div>
