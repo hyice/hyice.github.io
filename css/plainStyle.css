@@ -118,6 +118,19 @@ pre {
     background-color: transparent;
     border: none; }
 
+/*header 部分*/
+div.header h2.title {
+  font-family: Satisfy, cursive;
+  font-weight:normal;
+  font-size:36px;
+  margin-top: 10px;
+  margin-bottom: 50px;
+}
+
+div.header a {
+  border: 0px;
+}
+
 /*post 专用属性部分*/
 div.post h2 {
   font-size: 24px;
