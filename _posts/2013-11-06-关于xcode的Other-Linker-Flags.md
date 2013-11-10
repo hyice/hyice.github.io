@@ -2,7 +2,10 @@
 layout: post
 title: 关于Xcode的Other Linker Flags
 date: November 6, 2013
-category: ios    
+category: ios 
+excerpt: 在ios开发过程中，有时候会用到第三方的静态库(.a文件)，然后导入后发现编译正常但运行时会出现`selector not recognized`的错误，从而导致app闪退。接着仔细阅读库文件的说明文档，你可能会在文档中发现诸如在`Other Linker Flags`中加入`-ObjC`或者`-all_load`这样的解决方法。那么，`Other Linker Flags`到底是用来干什么的呢？还有`-ObjC`和`-all_load`到底发挥了什么作用呢？ 
+tags: ios Xcode -ObjC -all_load -force_load 
+
 ---
 
 *关键字*:`ios` `Xcode` `-ObjC` `-all_load` `-force_load`

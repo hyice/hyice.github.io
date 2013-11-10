@@ -11,14 +11,16 @@ body
     margin: 0 auto;
   }
 
-a:link {
-  
-    color: #4183C4; 
+a {
+
+  text-decoration: none;
+  border-bottom: 1px dashed;
+  color: #000000;
 }
 
-a:visited {
+a:hover {
 
-  color: #1a6f03;
+  color: #165fa6;
 }
 
 h1, h2, h3, h4, h5, h6 
@@ -36,12 +38,6 @@ h1 {
   color: black; 
   margin-bottom: 10px;
 }
-
-h2 {
-  font-size: 24px;
-  margin-top: 25px;
-  border-bottom: 1px solid #cccccc;
-  color: black; }
 
 h3 {
   font-size: 18px; }
@@ -121,3 +117,55 @@ pre {
   pre code, pre tt {
     background-color: transparent;
     border: none; }
+
+/*post 专用属性部分*/
+div.post h2 {
+  font-size: 24px;
+  margin-top: 25px;
+  border-bottom: 1px solid #cccccc;
+  color: black; }
+
+div.post a {
+  color: #4183C4;  }
+
+div.post a:hover {
+  color: #1a6f03;  }
+
+div.post a:visited {
+  color: #1a6f03;  }
+
+/*home 专用属性部分*/
+div.shortIntro {
+
+  margin-top: 30px;
+  margin-bottom: 70px;
+}
+
+div.shortIntro h2.title {
+
+  color: #1a1a1a;
+  margin-bottom: 10px;
+}
+
+div.shortIntro p.date,p.tag {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  color: #6a6a6a;
+}
+
+div.shortIntro p.excerpt{
+
+  margin-top: 10px;
+  margin-bottom: 0px;
+  color: #1a1a1a;
+}
+
+div.shortIntro a {
+
+  color: #1a1a1a;
+}
+
+div.shortIntro a:hover {
+
+  color: #165fa6;
+}
