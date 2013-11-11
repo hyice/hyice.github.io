@@ -63,7 +63,7 @@ excerpt: 平时用google搜索的时候，难免会碰到一些敏感词汇，�
 
 那么，goagent又是怎么骗过了伟大的GFW呢？首先，附一张原理图：
 
-![image](https://goagent.googlecode.com/issues/attachment?aid=14910000000&name=cms4g-proxy.png&token=5wihG8CD4241ZaSM6hjkEaexOy0%3A1384178970547&inline=1)
+![image](http://hyice-github-io.u.qiniudn.com/20131111-6.png)
 
 然后我来简单地讲解下：
 
