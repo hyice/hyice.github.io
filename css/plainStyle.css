@@ -7,7 +7,7 @@ body
     padding-bottom: 10px;
     background-color: white;
     padding: 30px; 
-    width: 630px;
+    max-width: 630px;
     margin: 0 auto;
   }
 
@@ -187,4 +187,16 @@ div.shortIntro a:hover {
 
   color: #165fa6;
   border-bottom: 1px dashed #165fa6;
+}
+
+div.friendlink {
+
+  border-top: 1px dashed #cccccc;
+  border-bottom: 1px dashed #cccccc;
+}
+
+div.footer{
+
+  margin-top: 15px;
+  text-align: center;
 }
