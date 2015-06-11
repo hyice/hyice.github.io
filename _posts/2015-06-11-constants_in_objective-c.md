@@ -1,4 +1,14 @@
-## Constants in Objective-C
+---
+layout: post
+title: Constants in Objective-C
+date: June 11, 2015
+category: ios
+tags: ios objective-c constant const define
+excerpt: 在刚开始学习编程的时候，我曾经被C里面的constant虐得死去活来。OC开发中之前也都只是模仿着用用，始终不曾认真研究过。这回，好好地探究一次。
+
+---
+
+关键字：`ios` `objective-c` `constant`
 
 在刚开始学习编程的时候，我曾经被C里面的constant虐得死去活来。Objective-C作为一个C的超集，自然从C中继承了constant的概念，C里面constant的用法对于Objective-C同样适用。
 
@@ -87,7 +97,7 @@ fuction(&b);
 
 ##### 常见的用法
 
-```objective-c
+```objc
 // 用法一，全局可能会用到的key
 /* 在.h文件中声明 */
 extern NSString * const kMyExampleKey;
@@ -102,7 +112,7 @@ static NSString * const kMyExampleKey = @"xxxxxxxx";
 
 类似上面这样的用法，相信大家一定看到过不少，因为系统的key基本也是这么定义的，比如用来获取键盘信息的`UIKeyboardFrameEndUserInfoKey`等。那么，不知道有没有人在自己模仿着定义的时候，写成了这样呢？
 
-```objective-c
+```objc
 /* 错误用法 */
 const NSString * kMyWrongExampleKey1 = @"xxxxxxxx";
 NSString const * kMyWrongExampleKey2 = @"xxxxxxxx";
@@ -116,7 +126,7 @@ NSString const * kMyWrongExampleKey2 = @"xxxxxxxx";
 
 除了用于定义key，const还可以定义一些固定的数值，比如tag，某个view固定的高度，固定的间距等。
 
-```objective-c
+```objc
 static const int kTextFieldTag = 1111;
 static const int kCellHeight = 100;
 static const int kVerticalPadding = 5;
@@ -130,7 +140,7 @@ static const int kVerticalPadding = 5;
 
 `#define`是用于宏定义的，定义的内容会在编译器工作前，就被批量替换掉。
 
-```objective-c
+```objc
 #define M_E         2.71828182845904523536028747135266250
 #define M_PI        3.14159265358979323846264338327950288
 ```
@@ -141,7 +151,7 @@ static const int kVerticalPadding = 5;
 
 说完了const的缺点，来说说const的优点。使用const定义的常量，是有确定的类型的，编译器会帮你做类型的检测，如果使用错误能够及时发现并改掉。而define虽然IDE也会帮着做一些检测，但是遇到问题的可能性会大上不少，比如下面这个场景：
 
-```objective-c
+```objc
 /* define 版本 */
 #define kTestValue 1
 CGFloat testResulte = kTestValue / 2;
@@ -162,7 +172,7 @@ define的版本得到的结果是0，而const版本是0.5。上面只是一个�
 
 最后来说点题外话，OC里面有个`NSString`的子类叫`__NSCFConstantString`，大家可以结合下面这段代码自己尝试着研究一下。
 
-```objective-c
+```objc
 /* 用于输出变量名、类名和地址的宏 */
 #define TestInfo(obj) \
 do{id _obj = ( obj );\

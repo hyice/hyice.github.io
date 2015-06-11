@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>关于Xcode的Other Linker Flags</title>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="/css/plainStyle.css">
+        <link rel="stylesheet" href="/css/github-markdown.css">
+        <link rel="stylesheet" href="/css/styles/xcode.css">
+        <script src="/css/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link href="http://fonts.googleapis.com/css?family=Satisfy" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="site">
+          <div class="header">
+            <h2 class="title"><a href="/">hyice's blog</a></h3>
+          </div>
+
+          <h1>关于Xcode的Other Linker Flags</h1>
+<p class="meta">06 Nov 2013</p>
+
+<div class="markdown-body">
+<p><em>关键字</em>:<code>ios</code> <code>Xcode</code> <code>-ObjC</code> <code>-all_load</code> <code>-force_load</code></p>
+
+<h2>背景</h2>
+
+<p>在ios开发过程中，有时候会用到第三方的静态库(.a文件)，然后导入后发现编译正常但运行时会出现<code>selector not recognized</code>的错误，从而导致app闪退。接着仔细阅读库文件的说明文档，你可能会在文档中发现诸如在<code>Other Linker Flags</code>中加入<code>-ObjC</code>或者<code>-all_load</code>这样的解决方法。</p>
+
+<p>那么，<code>Other Linker Flags</code>到底是用来干什么的呢？还有<code>-ObjC</code>和<code>-all_load</code>到底发挥了什么作用呢？</p>
+
+<h2>链接器</h2>
+
+<p>首先，要说明一下<code>Other Linker Flags</code>到底是用来干嘛的。说白了，就是<code>ld</code>命令除了默认参数外的其他参数。<code>ld</code>命令实现的是链接器的工作，详细说明可以在终端<code>man ld</code>查看。</p>
+
+<p>如果有人不清楚链接器是什么东西的话，我可以作个简单的说明。</p>
+
+<p>一个程序从简单易读的代码到可执行文件往往要经历以下步骤：</p>
+
+<blockquote>
+<p>源代码 &gt; 预处理器 &gt; 编译器 &gt; 汇编器 &gt; 机器码 &gt; 链接器 &gt; 可执行文件</p>
+</blockquote>
+
+<p>源文件经过一系列处理以后，会生成对应的<code>.obj</code>文件，然后一个项目必然会有许多<code>.obj</code>文件，并且这些文件之间会有各种各样的联系，例如函数调用。链接器做的事就是把这些目标文件和所用的一些库链接在一起形成一个完整的可执行文件。</p>
+
+<p>可能我描述的比较肤浅，因为我自己了解的也不是很深，建议大家读一下这篇文章，可以对链接器做的事情有个大概的了解：<a href="http://www.dutor.net/index.php/2012/02/what-linkers-do/">链接器做了什么</a></p>
+
+<h2>为什么会闪退</h2>
+
+<p>苹果官方Q&amp;A上有这么一段话：</p>
+
+<blockquote>
+<p>The &quot;selector not recognized&quot; runtime exception occurs due to an issue between the implementation of standard UNIX static libraries, the linker and the dynamic nature of Objective-C. Objective-C does not define linker symbols for each function (or method, in Objective-C) - instead, linker symbols are only generated for each class. If you extend a pre-existing class with categories, the linker does not know to associate the object code of the core class implementation and the category implementation. This prevents objects created in the resulting application from responding to a selector that is defined in the category.</p>
+</blockquote>
+
+<p>翻译过来，大概意思就是<code>Objective-C</code>的链接器并不会为每个方法建立符号表，而是仅仅为类建立了符号表。这样的话，如果静态库中定义了已存在的一个类的分类，链接器就会以为这个类已经存在，不会把分类和核心类的代码合起来。这样的话，在最后的可执行文件中，就会缺少分类里的代码，这样函数调用就失败了。</p>
+
+<h2>解决方法</h2>
+
+<p>解决方法在背景那块我就提到了，就是在<code>Other Linker Flags</code>里加上所需的参数，用到的参数一般有以下3个：</p>
+
+<ul>
+<li><code>-ObjC</code></li>
+<li><code>-all_load</code></li>
+<li><code>-force_load</code></li>
+</ul>
+
+<p>下面来说说每个参数存在的意义和具体做的事情。</p>
+
+<p>首先是<code>-ObjC</code>，一般这个参数足够解决前面提到的问题，苹果官方说明如下：</p>
+
+<blockquote>
+<p>This flag causes the linker to load every object file in the library that defines an Objective-C class or category. While this option will typically result in a larger executable (due to additional object code loaded into the application), it will allow the successful creation of effective Objective-C static libraries that contain categories on existing classes.</p>
+</blockquote>
+
+<p>简单说来，加了这个参数后，链接器就会把静态库中所有的<code>Objective-C</code>类和分类都加载到最后的可执行文件中，虽然这样可能会因为加载了很多不必要的文件而导致可执行文件变大，但是这个参数很好地解决了我们所遇到的问题。但是事实真的是这样的吗？</p>
+
+<p>如果<code>-ObjC</code>参数真的这么有效，那么事情就会简单多了。</p>
+
+<blockquote>
+<p>Important: For 64-bit and iPhone OS applications, there is a linker bug that prevents -ObjC from loading objects files from static libraries that contain only categories and no classes. The workaround is to use the -all<em>load or -force</em>load flags.</p>
+</blockquote>
+
+<p>当静态库中只有分类而没有类的时候，<code>-ObjC</code>参数就会失效了。这时候，就需要使用<code>-all_load</code>或者<code>-force_load</code>了。</p>
+
+<p><code>-all_load</code>会让链接器把所有找到的目标文件都加载到可执行文件中，但是<strong>千万不要随便使用这个参数</strong>！假如你使用了不止一个静态库文件，然后又使用了这个参数，那么你很有可能会遇到<code>ld: duplicate symbol</code>错误，因为不同的库文件里面可能会有相同的目标文件，所以建议在遇到<code>-ObjC</code>失效的情况下使用<code>-force_load</code>参数。</p>
+
+<p><code>-force_load</code>所做的事情跟<code>-all_load</code>其实是一样的，但是<code>-force_load</code>需要指定要进行全部加载的库文件的路径，这样的话，你就只是完全加载了一个库文件，不影响其余库文件的按需加载。</p>
+
+<h2>参考内容：</h2>
+
+<ol>
+<li><a href="https://developer.apple.com/library/mac/qa/qa1490/_index.html">苹果官方关于此问题的Q&amp;A</a></li>
+<li><a href="http://stackoverflow.com/questions/2567498/objective-c-categories-in-static-library">stackoverflow上的一个回答</a></li>
+<li><a href="http://www.dutor.net/index.php/2012/02/what-linkers-do/">链接器做了什么</a></li>
+</ol>
+
+</div>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+    var disqus_shortname = 'hyice-blog'; // required: replace example with your forum shortname
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    
+
+          <div class="friendlink">
+            <h3>Friend Links:</h3>
+            <ul>
+              <li><a href="http://www.nilennoct.com">达神的博客</a></li>
+              <li><a href="http://panda.zjutv.com">开拖拉机的熊猫</a></li>
+            </ul>
+          </div>
+          <div class="footer">
+            <p>Copyright © 2014 hyice<p>
+          </div>
+        </div>
+
+    </body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Mac翻墙指南+浅析goagent</title>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="/css/plainStyle.css">
+        <link rel="stylesheet" href="/css/github-markdown.css">
+        <link rel="stylesheet" href="/css/styles/xcode.css">
+        <script src="/css/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link href="http://fonts.googleapis.com/css?family=Satisfy" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="site">
+          <div class="header">
+            <h2 class="title"><a href="/">hyice's blog</a></h3>
+          </div>
+
+          <h1>Mac翻墙指南+浅析goagent</h1>
+<p class="meta">11 Nov 2013</p>
+
+<div class="markdown-body">
+<p>关键字：<code>mac</code> <code>safari</code> <code>goagent</code> <code>翻墙</code></p>
+
+<h2>背景</h2>
+
+<p>平时用google搜索的时候，难免会碰到一些敏感词汇，这时候我们就必须得等待几分钟，然后小心翼翼地去除敏感词汇后才能继续搜索。这不免让我们感到不爽，更不用说对youtube这些神奇网站的强烈好奇心了。于是翻墙成为了我们的必然选择，那么如何翻墙呢？翻墙的原理又是什么呢？</p>
+
+<h2>用什么翻墙</h2>
+
+<p>我对翻墙工具了解的不多，因为我一开始用的就是 goagent + Chrome 的组合。最近升级了Mavericks，因为听说Safari的性能得到了很大的优化，就改用了 goagent + Safari 的组合，然后就研究了下如何在Safari下实现翻墙。</p>
+
+<p>所以，这篇文章的主要内容就是在Safari下实现用goagent翻墙，加上对goagent的一点浅显分析。</p>
+
+<p>如果你不想使用goagent，而是想用诸如自由门这样的软件的话，请出门右转。</p>
+
+<h2>安装并使用goagent</h2>
+
+<p>关于这一部分，网上的教程已经泛滥成灾了，我自己也是看着其中的一些教程学会的，建议大家可以直接google一下，或者看一下我挑选的这篇攻略，额，准确说是<a href="https://code.google.com/p/goagent/wiki/InstallGuide">官方教程</a>。</p>
+
+<p>如果你使用的是Chrome，Firefox或者Opera的话，那么你可以满足地离开了，或者花点时间读读我对goagent的简单理解。</p>
+
+<h2>Safari该如何使用代理</h2>
+
+<p>我们先不谈原理，先来说说用Safari该怎么设置代理。有没有像Chrome那样方便使用的插件呢？我觉得我下面这个比插件更方便，因为完全原生无污染哦！</p>
+
+<p>打开<code>系统偏好设置</code>&gt;<code>网络</code>&gt;<code>位置</code>，然后可以看到如下界面：</p>
+
+<p><img src="http://hyice-github-io.u.qiniudn.com/20131111-1.png" alt="image"></p>
+
+<p>然后点击<code>编辑位置</code>，新增一个名为goagent的位置.</p>
+
+<p><img src="http://hyice-github-io.u.qiniudn.com/20131111-2.png" alt="image"></p>
+
+<p>然后确认，进入<code>高级</code>设置，选择<code>代理</code>的那个选项:</p>
+
+<p><img src="http://hyice-github-io.u.qiniudn.com/20131111-3.png" alt="image"></p>
+
+<p>最后勾选上<code>Web 代理</code>，然后代理服务器框里填上goagent的代理地址就可以了。</p>
+
+<p><img src="http://hyice-github-io.u.qiniudn.com/20131111-4.png" alt="image"></p>
+
+<p>当我们要使用代理的时候，在左上角菜单里即可进行快速选择。</p>
+
+<p><img src="http://hyice-github-io.u.qiniudn.com/20131111-5.png" alt="image"></p>
+
+<h2>goagent原理浅析</h2>
+
+<p>我们要浏览一个页面，一般来说是不可以从我们的电脑直接获取到目标服务器上的数据的，中间往往经过了很多服务器的中转。</p>
+
+<p>那么整个过程便可以这么理解：</p>
+
+<ol>
+<li>我们在我们的电脑上访问了一个站点</li>
+<li>我们的电脑发出了一个请求，要获取目标站点的数据</li>
+<li>这条请求被我们电脑和目标服务器之间的服务器不断传递，最后到达目标服务器</li>
+<li>目标服务器处理这条请求，然后决定把数据传给我们的电脑</li>
+<li>目标服务器传送的数据经过中间的服务器不断传递到达我们的电脑</li>
+<li>我们的电脑处理获得的数据，然后把页面展示在我们面前</li>
+</ol>
+
+<p>但是，这个过程并不是每次都可以顺利完成的。在忽略网络原因或者目标服务器坏了的情况下，我们还有伟大的GFW孜孜不倦地工作着，我们可以把GFW理解成其中一台必定会参与传递的中间服务器，当他发现要他传送的请求或者数据不符合他的规则时，他就会选择不传递，那么我们自然无法顺利加载我们的页面了。</p>
+
+<p>那么，goagent又是怎么骗过了伟大的GFW呢？首先，附一张原理图：</p>
+
+<p><img src="http://hyice-github-io.u.qiniudn.com/20131111-6.png" alt="image"></p>
+
+<p>然后我来简单地讲解下：</p>
+
+<ol>
+<li>goagent在本地运行的client成为了我们的第一个中转服务器，每一个我们发出的http请求都会先到达这个服务器。</li>
+<li>这个服务器做的事不是简单地把请求往下一个服务器传递，而是先对数据进行了一次封装，然后再把数据往后传送</li>
+<li>往后传送的时候，目的地不再是原来的目标服务器，而是位于GFW外部的GAE服务器，封装过的数据到达GAE服务器后，会被解封，然后把数据发往我们原来要求的服务器。</li>
+<li>这样，目标服务器就可以正确接受我们的请求包了，然后会按照正常流程相应，并把数据传给GAE服务器</li>
+<li>GAE服务器对响应的数据包进行封装，安全地传回到我们的Client</li>
+<li>Client对封装的数据进行解封处理，传给浏览器进行加载，然后我们就看到了正确的页面了。</li>
+</ol>
+
+<h2>参考内容</h2>
+
+<ol>
+<li><a href="https://code.google.com/p/goagent/">goagent的官方文档</a></li>
+<li><a href="http://www.zhihu.com/question/20370059">知乎上关于goagent原理的回答</a></li>
+</ol>
+
+</div>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+    var disqus_shortname = 'hyice-blog'; // required: replace example with your forum shortname
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    
+
+          <div class="friendlink">
+            <h3>Friend Links:</h3>
+            <ul>
+              <li><a href="http://www.nilennoct.com">达神的博客</a></li>
+              <li><a href="http://panda.zjutv.com">开拖拉机的熊猫</a></li>
+            </ul>
+          </div>
+          <div class="footer">
+            <p>Copyright © 2014 hyice<p>
+          </div>
+        </div>
+
+    </body>
+</html>

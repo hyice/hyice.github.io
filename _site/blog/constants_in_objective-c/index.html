@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Constants in Objective-C</title>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="/css/plainStyle.css">
+        <link rel="stylesheet" href="/css/github-markdown.css">
+        <link rel="stylesheet" href="/css/styles/xcode.css">
+        <script src="/css/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link href="http://fonts.googleapis.com/css?family=Satisfy" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="site">
+          <div class="header">
+            <h2 class="title"><a href="/">hyice's blog</a></h3>
+          </div>
+
+          <h1>Constants in Objective-C</h1>
+<p class="meta">11 Jun 2015</p>
+
+<div class="markdown-body">
+<p>关键字：<code>ios</code> <code>objective-c</code> <code>constant</code></p>
+
+<p>在刚开始学习编程的时候，我曾经被C里面的constant虐得死去活来。Objective-C作为一个C的超集，自然从C中继承了constant的概念，C里面constant的用法对于Objective-C同样适用。</p>
+
+<h3>来自C的一些用法</h3>
+
+<hr>
+
+<p>简单来说，一个变量如果用<code>const</code>修饰了，那它就变成了一个常量。在后续的程序中，再也无法被更改。但是这一简单的概念，实际用起来却并不简单。</p>
+
+<h5>简单定义一个常量</h5>
+
+<p>constant最简单的用法自然就是用<code>const</code>修饰符定义一个常量，然后在代码中使用它。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cm">/* 定义一个整形的常量 */</span>
+<span class="k">const</span> <span class="kt">int</span> <span class="n">myConstant</span> <span class="o">=</span> <span class="mi">21</span><span class="p">;</span>
+</code></pre></div>
+<p>如果const的用法都像上面这么简单，当年我也就不会被虐得死去活来了。可惜当它和指针结合在一起的时候，就不是那么容易懂了。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cm">/* 定义一个指向整形常量的指针，指针可以重新赋值指向另一个整形常量 */</span>
+<span class="k">const</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">myConstant1</span><span class="p">;</span>
+
+<span class="cm">/* 如果把const往后移动一下，效果依然一样 */</span>
+<span class="kt">int</span> <span class="k">const</span> <span class="o">*</span> <span class="n">myConstant2</span><span class="p">;</span>
+
+<span class="cm">/* 但是如果再移动一下，效果就不一样了。这里定义的是一个指向int的不可变指针，但是指向的int的值是可变的 */</span>
+<span class="kt">int</span> <span class="o">*</span> <span class="k">const</span> <span class="n">myConstant3</span><span class="p">;</span>
+
+<span class="cm">/* 组合起来，就是一个指向整形常量的不可变指针 */</span>
+<span class="kt">int</span> <span class="k">const</span> <span class="o">*</span> <span class="k">const</span> <span class="n">myConstant4</span><span class="p">;</span>
+<span class="c1">// 或者 const int * const myConstant4;</span>
+</code></pre></div>
+<p>根据我的理解，const会应用于紧贴在它左边的符号，当它左边没有任何符号的时候，就会应用到紧贴在它右边的符号。大家可以结合上面的四个例子自己理解一下，我感觉还是挺靠谱的。</p>
+
+<h5>作为函数的参数</h5>
+
+<p>当指针和const结合在一起的时候，虽然代码会变得有点复杂，但是相应的，程序也有了更多的可能。</p>
+
+<p>假如我们有下面这么一个函数，我们都知道函数里对a的改动并不会影响到b，因为b的值被拷贝了一份传给了a，它们两个在内存中的地址并不一样。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">function</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">15</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+<span class="n">function</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+</code></pre></div>
+<p>那么如果有这么一个函数，又会发生什么呢？</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">function</span><span class="p">(</span><span class="n">BigStructureType</span> <span class="n">a</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// 利用a进行一些逻辑，但并不会改动a</span>
+<span class="p">}</span>
+
+<span class="n">BigStructureType</span> <span class="n">b</span> <span class="o">=</span> <span class="n">SomeValue</span><span class="p">;</span>
+<span class="n">fuction</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+</code></pre></div>
+<p>尽管BigStructureType会很大，程序仍然会拷贝一份b的值，作为参数a传给函数，然后进行一系列的操作。但是，结构的内容在函数中并不会被改动，我们为什么不用一份数据呢，这样就可以少用一点内存了。于是，constant就派上用场了。</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">function</span><span class="p">(</span><span class="n">BigStructureType</span> <span class="k">const</span> <span class="o">*</span><span class="n">a</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// 可以通过 *a 获取到数据，然后进行一系列只读操作</span>
+<span class="p">}</span>
+
+<span class="n">BigStructureType</span> <span class="n">b</span> <span class="o">=</span> <span class="n">SomeValue</span><span class="p">;</span>
+<span class="n">fuction</span><span class="p">(</span><span class="o">&amp;</span><span class="n">b</span><span class="p">);</span>
+</code></pre></div>
+<h5>更多用途</h5>
+
+<p>我觉得一个东西的用途并不是固定的，只有了解一个东西的特性，你才能知道在你想做某件事情的时候，它是不是你的选择。用const定义了一个常量后，不可变的特性让它能够作为全局的识别符，通用的一些数值，或者便于修改的统一值。而当constant和指针结合在一起后，可能性就更多了，除了上面所说的函数参数，比如还可以用来修饰函数的返回值，避免改动一个不可改动的值。至于更多的内容，就让我们自己慢慢发掘吧。</p>
+
+<h3>Objective-C中的常量</h3>
+
+<hr>
+
+<p>在OC开发中，所有来自C的const的用法同样适用。不过在平常的开发中，我们用的并不会很多，最常见的应该就是用来定义一些dictionary的key了。</p>
+
+<h5>常见的用法</h5>
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="c1">// 用法一，全局可能会用到的key</span>
+<span class="cm">/* 在.h文件中声明 */</span>
+<span class="k">extern</span> <span class="bp">NSString</span> <span class="o">*</span> <span class="k">const</span> <span class="n">kMyExampleKey</span><span class="p">;</span>
+
+<span class="cm">/* 在.m文件中定义 */</span>
+<span class="bp">NSString</span> <span class="o">*</span> <span class="k">const</span> <span class="n">kMyExampleKey</span> <span class="o">=</span> <span class="s">@&quot;xxxxxxxx&quot;</span><span class="p">;</span>
+
+
+<span class="c1">// 用法二，单个文件中用到的key</span>
+<span class="k">static</span> <span class="bp">NSString</span> <span class="o">*</span> <span class="k">const</span> <span class="n">kMyExampleKey</span> <span class="o">=</span> <span class="s">@&quot;xxxxxxxx&quot;</span><span class="p">;</span>
+</code></pre></div>
+<p>类似上面这样的用法，相信大家一定看到过不少，因为系统的key基本也是这么定义的，比如用来获取键盘信息的<code>UIKeyboardFrameEndUserInfoKey</code>等。那么，不知道有没有人在自己模仿着定义的时候，写成了这样呢？</p>
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="cm">/* 错误用法 */</span>
+<span class="k">const</span> <span class="bp">NSString</span> <span class="o">*</span> <span class="n">kMyWrongExampleKey1</span> <span class="o">=</span> <span class="s">@&quot;xxxxxxxx&quot;</span><span class="p">;</span>
+<span class="bp">NSString</span> <span class="k">const</span> <span class="o">*</span> <span class="n">kMyWrongExampleKey2</span> <span class="o">=</span> <span class="s">@&quot;xxxxxxxx&quot;</span><span class="p">;</span>
+</code></pre></div>
+<p>如果你已经知道上面用法为什么是错误的，那么就可以跳过这一节了。之前在<code>简单定义一个常量</code>小节中，我提到了const的作用方式：</p>
+
+<blockquote>
+<p>根据我的理解，const会应用于紧贴在它左边的符号，当它左边没有任何符号的时候，就会应用到紧贴在它右边的符号。</p>
+</blockquote>
+
+<p>所以在上面的错误用法中，const都作用在了NSString上，而我们都知道，在OC中，可修改和不可修改的字符串被分为了<code>NSMutableString</code>和<code>NSString</code>。NSString本身就是不可修改的，const并不会产生什么作用。而在定义key的时候，我们本身的目的是想让key指向的字符串不要发生变化，显然应该让const用于修饰指针。</p>
+
+<p>除了用于定义key，const还可以定义一些固定的数值，比如tag，某个view固定的高度，固定的间距等。</p>
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">kTextFieldTag</span> <span class="o">=</span> <span class="mi">1111</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">kCellHeight</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">kVerticalPadding</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+</code></pre></div>
+<p>用const来定义这些数值，可以让代码中少一些magic number，增加代码的可读性。而且当需要更改某个数值的时候，仅需要轻松地改动一次。话说，你能够想象当你想把padding改成3的时候，却发现代码中各种不知道是不是padding的5的时候的感觉吗？</p>
+
+<h5>define VS. const</h5>
+
+<p>上面提到的const的用法，为我们日常工作提供了很多便利，但const并不是唯一的选择，有些时候，define可能会是更好的选择。</p>
+
+<p><code>#define</code>是用于宏定义的，定义的内容会在编译器工作前，就被批量替换掉。</p>
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="cp">#define M_E         2.71828182845904523536028747135266250</span>
+<span class="cp">#define M_PI        3.14159265358979323846264338327950288</span>
+</code></pre></div>
+<p>我无法准确地告诉你哪里要用const，哪里应该用define，我只能帮你分析一下各自的特性，具体要用哪个就要看你自己的取舍了。</p>
+
+<p><code>const</code>定义的常量是会占用内存空间的，如果是临时的还好，出了作用域就会被释放，但是如果是全局的，那么就会一直占用着内存空间。不幸的是，大多数你需要使用的场景，都会是全局的。幸运的是，以目前的设备状况来看，这么点内存的占用，应该是无关痛痒的。不过注意一点总是没错的，不要滥用。而<code>define</code>因为在编译前就会被批量替换掉，所以并没有这个问题。</p>
+
+<p>说完了const的缺点，来说说const的优点。使用const定义的常量，是有确定的类型的，编译器会帮你做类型的检测，如果使用错误能够及时发现并改掉。而define虽然IDE也会帮着做一些检测，但是遇到问题的可能性会大上不少，比如下面这个场景：</p>
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="cm">/* define 版本 */</span>
+<span class="cp">#define kTestValue 1</span>
+<span class="n">CGFloat</span> <span class="n">testResulte</span> <span class="o">=</span> <span class="n">kTestValue</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+
+<span class="cm">/* const 版本 */</span>
+<span class="k">const</span> <span class="n">CGFloat</span> <span class="n">kTestValue</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="n">CGFloat</span> <span class="n">testResult</span> <span class="o">=</span> <span class="n">kTestValue</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</code></pre></div>
+<p>define的版本得到的结果是0，而const版本是0.5。上面只是一个简单的例子，实际使用过程中肯定不会这么简单，复杂的代码逻辑可能会把define导致的问题隐藏起来，增加寻找bug的难度。当然，如果你注意一点，定义的时候写成<code>#define kTestValue ((CGFloat)1)</code>或者<code>#define kTestValue 1.0</code>就没有问题了。</p>
+
+<p>另外const还有一个比较大的好处就是，可以更快捷地进行比较。如果用const来定义key，就不需要对字符串的内容进行比较了，只需要比较两个key的地址就可以了，可以大大增加比较的速度。</p>
+
+<p>在我平常的使用过程中，我一般用const来定义一些key，而用define来定义一些固定的数值。至于你怎么用，就看你的心情喽！</p>
+
+<h5>被隐藏的常量</h5>
+
+<p>最后来说点题外话，OC里面有个<code>NSString</code>的子类叫<code>__NSCFConstantString</code>，大家可以结合下面这段代码自己尝试着研究一下。</p>
+<div class="highlight"><pre><code class="language-objc" data-lang="objc"><span class="cm">/* 用于输出变量名、类名和地址的宏 */</span>
+<span class="cp">#define TestInfo(obj) \</span>
+<span class="cp">do{id _obj = ( obj );\</span>
+<span class="cp">printf(&quot;%-61s %-20s %-16p\n&quot;, #obj&quot; :&quot;, [NSStringFromClass([_obj class]) UTF8String], _obj);\</span>
+<span class="cp">}while(0);</span>
+
+<span class="cm">/* 定义了5个内容为“abcdef”的NSString指针 */</span>
+<span class="bp">NSString</span> <span class="o">*</span> <span class="k">const</span> <span class="n">test1</span> <span class="o">=</span> <span class="s">@&quot;abcdef&quot;</span><span class="p">;</span>
+<span class="bp">NSString</span> <span class="o">*</span> <span class="k">const</span> <span class="n">test2</span> <span class="o">=</span> <span class="s">@&quot;abcdef&quot;</span><span class="p">;</span>
+<span class="bp">NSString</span> <span class="o">*</span> <span class="n">test3</span> <span class="o">=</span> <span class="s">@&quot;abcdef&quot;</span><span class="p">;</span>
+<span class="bp">NSString</span> <span class="o">*</span> <span class="n">test4</span> <span class="o">=</span> <span class="p">[</span><span class="s">@&quot;abcdef&quot;</span> <span class="k">copy</span><span class="p">];</span>
+<span class="bp">NSString</span> <span class="o">*</span> <span class="n">test5</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSString</span> <span class="nl">stringWithFormat</span><span class="p">:</span><span class="s">@&quot;abcdef&quot;</span><span class="p">];</span>
+
+<span class="cm">/* 分别输出5个变量的信息 */</span>
+<span class="n">TestInfo</span><span class="p">(</span><span class="n">test1</span><span class="p">);</span>
+<span class="n">TestInfo</span><span class="p">(</span><span class="n">test2</span><span class="p">);</span>
+<span class="n">TestInfo</span><span class="p">(</span><span class="n">test3</span><span class="p">);</span>
+<span class="n">TestInfo</span><span class="p">(</span><span class="n">test4</span><span class="p">);</span>
+<span class="n">TestInfo</span><span class="p">(</span><span class="n">test5</span><span class="p">);</span>
+
+<span class="cm">/* 你们觉得结果会是怎样的呢？又有几个变量的地址会是一样的呢？ */</span>
+</code></pre></div>
+</div>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+    var disqus_shortname = 'hyice-blog'; // required: replace example with your forum shortname
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    
+
+          <div class="friendlink">
+            <h3>Friend Links:</h3>
+            <ul>
+              <li><a href="http://www.nilennoct.com">达神的博客</a></li>
+              <li><a href="http://panda.zjutv.com">开拖拉机的熊猫</a></li>
+            </ul>
+          </div>
+          <div class="footer">
+            <p>Copyright © 2014 hyice<p>
+          </div>
+        </div>
+
+    </body>
+</html>
